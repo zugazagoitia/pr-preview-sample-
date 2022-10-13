@@ -1,5 +1,5 @@
 name: PR Preview
-run-name: Preview of pr ${{ github.event.pull_request.number }} by ${{ github.event.pull_request. }}
+run-name: Preview of pr ${{ github.event.pull_request.number }} by ${{ github.event.pull_request.user.login }}
 
 on:
   pull_request_target:
@@ -33,10 +33,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.BOT }}
 
+      - name: Jekyll Actions
+        uses: helaili/jekyll-action@2.4.0
+        with:
+          build_only: true
+          jekyll_build_options: --baseurl ${{ github.event.pull_request.number }}/
+          build_dir: ./_site
+    
       - uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.BOT }}
-          enable_jekyll: true
+          publish_dir: ./_site
           external_repository: zugazagoitia/${{ github.event.pull_request.number }}
 
       - name: Sleep to make sure page gets updated
