@@ -1,0 +1,54 @@
+<div class="star-us">
+    <div>
+        <span id="starUsLong">If you want to support Javalin, consider sponsoring or starring:</span>
+        <span id="starUsShort">Support Javalin?</span>
+    </div>
+    {% include macros/sponsor-button.html %}
+    <iframe id="starFrame" class="githubStar"
+            src="https://ghbtns.com/github-btn.html?user=javalin&amp;repo=javalin&amp;type=star&amp;count=true&size=large"
+            frameborder="0" scrolling="0" width="150px" height="35px">
+    </iframe>
+</div>
+<style>
+    .star-us {
+        display: flex;
+        align-items: center;
+        padding: 24px;
+        margin: 40px 0;
+        font-family: 'Roboto Slab', sans-serif;
+        font-weight: 500;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        border-bottom: 2px solid #ff6363;
+    }
+
+    #starUsShort {
+        font-size: 15px;
+        letter-spacing: -0.5px;
+        font-weight: bold;
+        display: none;
+    }
+
+    @media (max-width: 700px) {
+        #starUsLong {
+            display: none;
+        }
+
+        #starUsShort {
+            display: block;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .star-us {
+            flex-direction: column;
+        }
+        .star-us * + * {
+            margin-top: 12px;
+        }
+        .star-us #starUsShort {
+            font-size: 20px;
+        }
+    }
+</style>

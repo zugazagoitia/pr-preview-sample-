@@ -1,0 +1,99 @@
+.tutorials .post-summary {
+  position: relative;
+
+  .tutorial-languages {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+
+    .tutorial-language {
+      text-transform: capitalize;
+      background: #d6f0f9;
+      border-radius: 5px;
+      padding: 1px 6px;
+      display: inline-block;
+      font-size: 14px;
+      + .tutorial-language {
+        margin-left: 4px;
+      }
+    }
+  }
+}
+
+.tutorial {
+  #timeToRead {
+    float: right;
+  }
+
+  .tutorial-header .notification {
+    font-size: 14px;
+    margin-bottom: 30px;
+
+    .github-link {
+      display: block;
+      width: 100%;
+      padding-top: 8px;
+      margin-top: 8px;
+      border-top: 1px solid $light-border;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .tutorial #timeToRead {
+    white-space: nowrap;
+    margin-top: 4px;
+    display: inline-block;
+    float: none;
+  }
+}
+
+/* Tutorial overview tabs */
+.tutorial-tabs {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  display: flex;
+
+  .tutorial-tab {
+    font-size: 24px;
+    font-family: 'Roboto Slab', arial, sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+
+    + .tutorial-tab {
+      margin-left: 20px;
+    }
+  }
+}
+
+.all-tutorials[data-tab=official] {
+  [data-tutorial-tab=official] {
+    border-bottom: 3px solid $javalin-brand-primary;
+  }
+
+  [data-tutorial-content=community] {
+    display: none;
+  }
+}
+
+.all-tutorials[data-tab=community] {
+  [data-tutorial-tab=community] {
+    border-bottom: 3px solid $javalin-brand-primary;
+  }
+
+  [data-tutorial-content=official] {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .tutorial-tabs .tutorial-tab {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tutorial-tabs .tutorial-tab {
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,14 @@
+javalinThreeVersion: 3.13.13
+javalinversion: 5.0.1
+slf4jversion: 1.7.36
+repourl: https://github.com/javalin/javalin.github.io
+description: Javalin - A lightweight Java and Kotlin web framework. Create REST APIs in Java or Kotlin easily.
+baseurl: "" # the subpath of your site, e.g. /blog
+
+# Build settings
+markdown: kramdown
+sass:
+  sass_dir: _sass
+  style: compressed
+plugins:
+  - jekyll-sitemap

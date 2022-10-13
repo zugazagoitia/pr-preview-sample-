@@ -1,0 +1,8 @@
+{
+    "cSpell.words": [
+        "Quickstart"
+    ],
+    "yaml.schemas": {
+        "https://json.schemastore.org/github-workflow.json": "file:///c%3A/Projects/javalin.github.io/.github/ISSUE_TEMPLATE/workflows/pr-previews.yml"
+    }
+}
