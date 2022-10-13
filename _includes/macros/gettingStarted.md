@@ -1,6 +1,8 @@
 {% capture java %}
 import io.javalin.Javalin;
 
+THIS DOES NOT COMPILE
+
 public class HelloWorld {
     public static void main(String[] args) {
         var app = Javalin.create(/*config*/)
