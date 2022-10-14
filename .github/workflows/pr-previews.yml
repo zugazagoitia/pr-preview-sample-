@@ -3,10 +3,10 @@ run-name: Preview of pr ${{ github.event.pull_request.number }} by ${{ github.ev
 
 on:
   pull_request_target:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, closed]
 
 permissions:
-  pull-requests: read
+  pull-requests: write
   contents: read
 
 
@@ -14,6 +14,8 @@ jobs:
   Build:
     runs-on: ubuntu-latest
     steps:
+
+        # Create the comment to be updated
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
@@ -28,29 +30,28 @@ jobs:
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
 
-      - if: ${{ github.event.action == 'opened'}}
-        run: gh repo create zugazagoitia/${{ github.event.pull_request.number }} --public
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT }}
+      # Build the site
+      - name: Jekyll Actions 
+        uses: helaili/jekyll-action@2.4.0 
+        with: 
+          build_only: true 
+          build_dir: ./_site 
 
-      - name: Jekyll Actions
-        uses: helaili/jekyll-action@2.4.0
-        with:
-          build_only: true
-          jekyll_build_options: --baseurl ${{ github.event.pull_request.number }}/
-          build_dir: ./_site
+      - name: Install surge
+        run: npm install -g surge
     
-      - uses: peaceiris/actions-gh-pages@v3
-        with:
-          personal_token: ${{ secrets.BOT }}
-          publish_dir: ./_site
-          external_repository: zugazagoitia/${{ github.event.pull_request.number }}
+      - if: ${{ github.event.action != 'closed' }}
+        name: Deploy to surge
+        run: surge --project ./_site --token ${{ secrets.SURGE_TOKEN }} --domain javalin-pr-${{ github.event.pull_request.number }}-preview.surge.sh
 
-      - name: Sleep to make sure page gets updated
-        run: sleep 1m
-        shell: bash
+      # Delete the preview when the PR is closed or merged
+      - if: ${{ github.event.action == 'closed' }}
+        name: Tear down surge
+        run: surge teardown javalin-pr-${{ github.event.pull_request.number }}-preview.surge.sh --token ${{ secrets.SURGE_TOKEN }}
 
-      - name: comment Preview Ready
+      # Update the comment if the pr was not closed
+      - if: ${{ github.event.action != 'closed' }}
+        name: comment Preview Ready
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
@@ -59,8 +60,18 @@ jobs:
             |-|-|
             | 🔨 Latest commit | ${{ github.event.pull_request.head.sha }} |
             | 🔍 Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
-            | 😎 Deploy Preview | https://zugazagoitia.github.io/${{ github.event.pull_request.number }} |
-          GITHUB_TOKEN: ${{ secrets.BOT }}
+            | 🌐 Preview | https://javalin-pr-${{ github.event.pull_request.number }}-preview.surge.sh |
+  
+      # Delete the preview when the PR is closed or merged
+      - if: ${{ github.event.action == 'closed' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            ### 🗑 Deploy Preview for javalin.io deleted.
+            | Name | Link |
+            |-|-|
+            | 🔨 Latest commit | ${{ github.event.pull_request.head.sha }} |
+            | 🔍 Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
 
       - if: ${{ failure() }}
         uses: marocchino/sticky-pull-request-comment@v2
@@ -71,4 +82,5 @@ jobs:
             |-|-|
             | 🔨 Latest commit | ${{ github.event.pull_request.head.sha }} |
             | 🔍 Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
-          GITHUB_TOKEN: ${{ secrets.BOT }}    
+
+
