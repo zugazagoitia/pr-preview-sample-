@@ -24,7 +24,6 @@ jobs:
             |-|-|
             | 🔨 Latest commit | ${{ github.event.pull_request.head.sha }} |
             | 🔍 Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
-          GITHUB_TOKEN: ${{ secrets.BOT }}
 
       - uses: actions/checkout@v3
         with:
