@@ -24,17 +24,20 @@ jobs:
             |-|-|
             | 🔨 Latest commit | ${{ github.event.pull_request.head.sha }} |
             | 🔍 Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
-
+            
       - uses: actions/checkout@v3
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.5.1
+        
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true   
 
-      # Build the site
-      - name: Jekyll Actions 
-        uses: helaili/jekyll-action@2.4.0 
-        with: 
-          build_only: true 
-          build_dir: ./_site 
+      - name: Build jekyll site
+        run: jekyll build
 
       - name: Install surge
         run: npm install -g surge
@@ -68,6 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.action == 'closed' }}
     steps:
+    
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.5.1
+        
       - name: Install surge
         run: npm install -g surge
 
