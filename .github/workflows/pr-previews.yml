@@ -6,17 +6,16 @@ on:
     types: [opened, reopened, synchronize, closed]
 
 permissions:
-  pull-requests: write
-  contents: read
-
+  pull-requests: write # Required to add a comment to the PR
+  contents: read # Required to checkout the PR branch
 
 jobs:
   Deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.action != 'closed' }}
-    steps:
-        # Create the comment to be updated
-      - uses: marocchino/sticky-pull-request-comment@v2
+    steps: 
+      - name: Create the comment to be updated
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
             ### 👷 Deploy Preview for javalin.io processing.
@@ -24,18 +23,29 @@ jobs:
             |-|-|
             | 🔨 Latest commit | ${{ github.event.pull_request.head.sha }} |
             | 🔍 Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
-            
-      - uses: actions/checkout@v3
+
+      - name: Checkout the PR branch
+        uses: actions/checkout@v3
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
-          
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.5.1
+        with:
+          node-version: 18
         
-      - uses: ruby/setup-ruby@v1
+      - name: Setup Ruby and Gems
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.3.1
           bundler-cache: true   
+
+      - name: Update contributor list
+        run: |
+          echo "Generating contributor list"
+          cd _data
+          node update-contributors.js
+          cd ..    
 
       - name: Build jekyll site
         run: bundle exec jekyll build
@@ -46,7 +56,7 @@ jobs:
       - name: Deploy to surge
         run: surge --project ./_site --token ${{ secrets.SURGE_TOKEN }} --domain javalin-pr-${{ github.event.pull_request.number }}-preview.surge.sh
 
-      - name: comment Preview Ready
+      - name: Update comment to Preview Ready
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
@@ -59,6 +69,7 @@ jobs:
   
 
       - if: ${{ failure() }}
+        name: Update comment to Preview Failed
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
@@ -72,18 +83,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.action == 'closed' }}
     steps:
-    
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3.5.1
-        
       - name: Install surge
         run: npm install -g surge
 
       - name: Tear down surge
         run: surge teardown javalin-pr-${{ github.event.pull_request.number }}-preview.surge.sh --token ${{ secrets.SURGE_TOKEN }}
 
-        # Delete the preview when the PR is closed or merged
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - name: Update comment to Preview Deleted
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
             ### 🗑 Deploy Preview for javalin.io deleted.
@@ -93,10 +100,11 @@ jobs:
             | 🔍 Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
       
       - if: ${{ failure() }}
+        name: Update comment to Preview Delete Failed
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
-            ### ❌ Deploy Preview for javalin.io failed.
+            ### ❌ Delete Preview for javalin.io failed.
             | Name | Link |
             |-|-|
             | 🔨 Latest commit | ${{ github.event.pull_request.head.sha }} |
