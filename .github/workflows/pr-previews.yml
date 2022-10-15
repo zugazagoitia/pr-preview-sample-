@@ -38,7 +38,7 @@ jobs:
           bundler-cache: true   
 
       - name: Build jekyll site
-        run: jekyll build
+        run: bundle exec jekyll build
 
       - name: Install surge
         run: npm install -g surge
